@@ -4,7 +4,7 @@ Cat scan localization in medical imaging is an essential aspect of contemporary 
 
 The dataset used in this analysis is the "Relative location of CT slices on axial axis" dataset, obtained from the UCI Machine Learning Repository. This dataset consists of CT scan images represented as 2D matrices, with each matrix corresponding to a CT slice.
 
-Dataset 
+Dataset : 
 https://archive.ics.uci.edu/dataset/206/relative+location+of+ct+slices+on+axial+axis
 
 we will take “reference’ as target variable and we will estimate the relative location of CT slices on the axial axis. 
