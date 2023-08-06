@@ -1,7 +1,9 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_file
 import pickle
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+
+from ImagePrediction import markPointInImage
 
 
 app = Flask(__name__)
@@ -31,7 +33,7 @@ def predictNonPcaModels(features):
     elastic = elasticNetModel.predict([features])
     decision = decisionModel.predict([features])
     ensemble = ensembleModel.predict([[linear[0],ridge[0],elastic[0],decision[0]]])
-    return f"Linear Model : {linear[0]}\nRidge Model : {ridge[0]}\nElastice Net Model : {elastic[0]}\nDecision Tree Model : {decision[0]}\nEnsemble Model : {ensemble[0]}"
+    return ensemble[0]
 
 #method to predict other models that use pca vectors
 def predictingPcaModels(pca):
@@ -45,11 +47,13 @@ def getFeatures():
         features = data['features']
         if len(features) == 384:
             prediction = predictNonPcaModels(features)
-            pcaVectors = convertToPcaVectors(features)
+            predictionImage = markPointInImage(round(prediction,2))
+            #pcaVectors = convertToPcaVectors(features)
             #otherPredictions = predictingPcaModels(pcaVectors)
             #finalOuptut = prediction+otherPredictions
             #return finalOuptut
-            return prediction
+            #return send_file(path_or_file=predictionImage, download_name="catscan.jpg", mimetype='image/gif', as_attachment=True)
+            return "done"
         else:
             return f"Input is {len(features)}"
 
