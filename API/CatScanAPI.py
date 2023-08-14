@@ -6,40 +6,38 @@ from sklearn.preprocessing import StandardScaler
 
 from ImagePrediction import markPointInImage
 
-
 app = Flask(__name__)
-
 
 #load the model
 file = os.getcwd()+"\API\Models\\"
-linearModel = pickle.load(open(file+"linearModel.pkl", "rb"))
-ridgeModel = pickle.load(open(file+"ridgeModel.pkl", "rb"))
-elasticNetModel = pickle.load(open(file+"elasticNetModel.pkl", "rb"))
-decisionModel = pickle.load(open(file+"decisionTreeModel.pkl", "rb"))
-ensembleModel = pickle.load(open(file+"ensembleModel.pkl", "rb"))
+linearModel = pickle.load(open(file+"linear.pkl", "rb"))
+ridgeModel = pickle.load(open(file+"ridge.pkl", "rb"))
+elasticNetModel = pickle.load(open(file+"elastic.pkl", "rb"))
+decisionModel = pickle.load(open(file+"decision.pkl", "rb"))
+ensembleModel = pickle.load(open(file+"ensemble.pkl", "rb"))
+scaler = pickle.load(open(file+"scaler.pkl", "rb"))
+pca = pickle.load(open(file+"pca.pkl", "rb"))
 
 #method to convert feature to pca vectors
 def convertToPcaVectors(features):
-    scaler = StandardScaler()
-    scaledFeatures = scaler.fit_transform([features])
-    pca = PCA(0.75)
-    pcaVectors = pca.fit_transform(scaledFeatures)
+    scaledFeatures = scaler.transform([features])
+    pcaVectors = pca.transform(scaledFeatures)
     return pcaVectors
-
 
 #method to predict linear regression values
 def predictNonPcaModels(features):
     linear = linearModel.predict([features])
-    ridge = ridgeModel.predict([features])
-    elastic = elasticNetModel.predict([features])
-    decision = decisionModel.predict([features])
-    ensemble = ensembleModel.predict([[linear[0],ridge[0],elastic[0],decision[0]]])
+    pcaModels = predictingPcaModels(features)
+    ensemble = ensembleModel.predict([[linear[0]]+pcaModels])
     return ensemble[0]
 
 #method to predict other models that use pca vectors
-def predictingPcaModels(pca):
-    pass
-
+def predictingPcaModels(features):
+    pca = convertToPcaVectors(features)
+    ridge = ridgeModel.predict(pca)
+    elastic = elasticNetModel.predict(pca)
+    decision = decisionModel.predict(pca)
+    return [ridge[0], elastic[0], decision[0]]
 
 @app.route('/sliceLocalizationPrediction', methods = ['POST'])
 def getFeatures():
