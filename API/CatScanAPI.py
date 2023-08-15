@@ -24,20 +24,15 @@ def convertToPcaVectors(features):
     pcaVectors = pca.transform(scaledFeatures)
     return pcaVectors
 
-#method to predict linear regression values
-def predictNonPcaModels(features):
-    linear = linearModel.predict([features])
-    pcaModels = predictingPcaModels(features)
-    ensemble = ensembleModel.predict([[linear[0]]+pcaModels])
-    return ensemble[0]
-
 #method to predict other models that use pca vectors
 def predictingPcaModels(features):
     pca = convertToPcaVectors(features)
+    linear = linearModel.predict(pca)
     ridge = ridgeModel.predict(pca)
     elastic = elasticNetModel.predict(pca)
     decision = decisionModel.predict(pca)
-    return [ridge[0], elastic[0], decision[0]]
+    ensemble = ensembleModel.predict([[linear[0], ridge[0], elastic[0], decision[0]]])
+    return ensemble[0]
 
 @app.route('/sliceLocalizationPrediction', methods = ['POST'])
 def getFeatures():
@@ -45,7 +40,7 @@ def getFeatures():
         data = request.get_json()
         features = data['features']
         if len(features) == 384:
-            prediction = predictNonPcaModels(features)
+            prediction = predictingPcaModels(features)
             predictionImage = markPointInImage(round(prediction,2))
             response = jsonify({'image':predictionImage.tolist()})
             return response
