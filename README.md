@@ -1,4 +1,4 @@
-# CAT-Scan-Localization
+# CT-Scan-Localization
 
 Cat scan localization in medical imaging is an essential aspect of contemporary healthcare. Computed Tomography (CT) scans provide detailed cross-sectional images of the human body, and it is of the utmost importance to precisely determine the relative location of each CT slice on the axial axis. This endeavor facilitates accurate anatomical mapping, which aids in the diagnosis, treatment planning, and monitoring of a variety of medical conditions.
 
